@@ -340,7 +340,7 @@ function drawAnswerCells() {
     }
 }
 
-const GAME_VERSION = '4';
+const GAME_VERSION = '5';
 
 function drawVersion() {
     ctx.save();
@@ -423,8 +423,10 @@ window.addEventListener('keydown', (e) => {
         return;
     }
     if (e.key === 'ArrowLeft') {
+        e.preventDefault();
         falling.x = Math.max(0, falling.x - 1);
     } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
         falling.x = Math.min(answerCells - 1, falling.x + 1);
     } else if (e.key === ' ') {
         fastDropActive = true;
