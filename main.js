@@ -340,7 +340,7 @@ function drawAnswerCells() {
     }
 }
 
-const GAME_VERSION = '2';
+const GAME_VERSION = '3';
 
 function drawVersion() {
     ctx.save();
