@@ -242,7 +242,7 @@ function drawAnswerCells() {
     }
 }
 
-const GAME_VERSION = '6';
+const GAME_VERSION = '7';
 
 function drawVersion() {
     ctx.save();
@@ -252,6 +252,28 @@ function drawVersion() {
     ctx.textBaseline = 'bottom';
     ctx.fillText('v' + GAME_VERSION, canvas.width - 12, canvas.height - 12);
     ctx.restore();
+}
+
+function drawFalling() {
+    ctx.fillStyle = '#1976d2';
+    ctx.font = '36px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const fx = falling.x * cellWidth + cellWidth / 2;
+    const fy = falling.y + 40;
+    // Проверяем ширину текста
+    const text = falling.question;
+    const textWidth = ctx.measureText(text).width;
+    let drawX = fx;
+    // Если текст выходит за левую границу
+    if (drawX - textWidth / 2 < 0) {
+        drawX = textWidth / 2 + 5;
+    }
+    // Если текст выходит за правую границу
+    if (drawX + textWidth / 2 > canvas.width) {
+        drawX = canvas.width - textWidth / 2 - 5;
+    }
+    ctx.fillText(text, drawX, fy);
 }
 
 function draw() {
