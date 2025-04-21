@@ -84,7 +84,7 @@ function generateAnswers(correctAnswer) {
 // Начальные параметры падающего примера
 let falling = {
     ...generateExample(),
-    x: 1, // индекс ячейки (от 0 до answerCells-1)
+    x: 1, // всегда вторая колонка
     y: 0,
     speed: 2,
 };
@@ -102,6 +102,28 @@ let fastDropActive = false;
 let level = 1;
 let correctInLevel = 0;
 
+// --- Управление для мобильных устройств ---
+let lastTap = 0;
+canvas.addEventListener('touchstart', function (e) {
+    if (gameOver) {
+        resetGame();
+        return;
+    }
+    if (e.touches.length === 1) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        // Определяем колонку
+        const col = Math.floor(x / (canvas.width / answerCells));
+        falling.x = Math.max(0, Math.min(answerCells - 1, col));
+        // Double tap detection
+        const now = Date.now();
+        if (now - lastTap < 350) {
+            fastDropActive = true;
+        }
+        lastTap = now;
+    }
+});
+
 function getNormalSpeed() {
     return (2 + (level - 1) * 1.2) / 2;
 }
@@ -118,7 +140,7 @@ function resetGame() {
     correctInLevel = 0;
     falling = {
         ...generateExample(),
-        x: Math.floor(Math.random() * answerCells),
+        x: 1, // всегда вторая колонка
         y: 0,
         speed: getNormalSpeed(),
     };
@@ -298,6 +320,18 @@ function drawAnswerCells() {
     }
 }
 
+const GAME_VERSION = '1';
+
+function drawVersion() {
+    ctx.save();
+    ctx.font = '20px Arial';
+    ctx.fillStyle = '#1976d2';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('v' + GAME_VERSION, canvas.width - 12, canvas.height - 12);
+    ctx.restore();
+}
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawHeader();
@@ -306,6 +340,7 @@ function draw() {
     drawFalling();
     drawFeedback();
     if (gameOver) drawGameOver();
+    drawVersion();
 }
 
 function update() {
@@ -326,7 +361,6 @@ function update() {
             correctInLevel++;
             feedback = {type: 'success', timer: 30};
             if (baseLineY < maxLineY) baseLineY += cellHeight;
-            // Повышение уровня
             if (correctInLevel >= 3) {
                 level++;
                 correctInLevel = 0;
@@ -341,7 +375,7 @@ function update() {
         }
         falling = {
             ...generateExample(),
-            x: Math.floor(Math.random() * answerCells),
+            x: 1, // всегда вторая колонка
             y: 0,
             speed: getNormalSpeed(),
         };
