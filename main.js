@@ -210,39 +210,7 @@ function drawGameOver() {
 const dinoImg = new Image();
 dinoImg.src = 'green_cartoon_dino.png';
 
-function drawDino() {
-    // Динозавр занимает всё пространство между низом и плашкой
-    const dinoTop = baseLineY + cellHeight;
-    const dinoBottom = canvas.height;
-    const dinoHeight = dinoBottom - dinoTop;
-    const dinoWidth = canvas.width * 0.5;
-    const dinoX = canvas.width / 2 - dinoWidth / 2;
-    const dinoY = dinoTop;
-    if (dinoImg.complete) {
-        ctx.drawImage(dinoImg, dinoX, dinoY, dinoWidth, dinoHeight);
-    } else {
-        dinoImg.onload = () => {
-            ctx.drawImage(dinoImg, dinoX, dinoY, dinoWidth, dinoHeight);
-        };
-    }
-}
-
-function drawAnswerCells() {
-    for (let i = 0; i < answerCells; i++) {
-        ctx.fillStyle = '#e0e0e0';
-        ctx.fillRect(i * cellWidth, baseLineY, cellWidth, cellHeight);
-        ctx.strokeStyle = '#333';
-        ctx.strokeRect(i * cellWidth, baseLineY, cellWidth, cellHeight);
-        // Рисуем вариант ответа
-        ctx.fillStyle = '#333';
-        ctx.font = '28px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(answers[i], i * cellWidth + cellWidth / 2, baseLineY + cellHeight / 2);
-    }
-}
-
-const GAME_VERSION = '7';
+const GAME_VERSION = '8';
 
 function drawVersion() {
     ctx.save();
@@ -274,6 +242,36 @@ function drawFalling() {
         drawX = canvas.width - textWidth / 2 - 5;
     }
     ctx.fillText(text, drawX, fy);
+}
+
+function drawDino() {
+    // Динозавр занимает всё пространство между низом и плашкой
+    const dinoTop = baseLineY + cellHeight;
+    const dinoBottom = canvas.height;
+    let dinoHeight = dinoBottom - dinoTop;
+    const minDinoHeight = 60;
+    if (dinoHeight < minDinoHeight) dinoHeight = minDinoHeight;
+    const dinoWidth = canvas.width * 0.5;
+    const dinoX = canvas.width / 2 - dinoWidth / 2;
+    const dinoY = dinoBottom - dinoHeight;
+    if (dinoImg.complete && dinoImg.naturalWidth > 0) {
+        ctx.drawImage(dinoImg, dinoX, dinoY, dinoWidth, dinoHeight);
+    }
+}
+
+function drawAnswerCells() {
+    for (let i = 0; i < answerCells; i++) {
+        ctx.fillStyle = '#e0e0e0';
+        ctx.fillRect(i * cellWidth, baseLineY, cellWidth, cellHeight);
+        ctx.strokeStyle = '#333';
+        ctx.strokeRect(i * cellWidth, baseLineY, cellWidth, cellHeight);
+        // Рисуем вариант ответа
+        ctx.fillStyle = '#333';
+        ctx.font = '28px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(answers[i], i * cellWidth + cellWidth / 2, baseLineY + cellHeight / 2);
+    }
 }
 
 function draw() {
