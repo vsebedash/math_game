@@ -112,8 +112,9 @@ canvas.addEventListener('touchstart', function (e) {
     if (e.touches.length === 1) {
         const rect = canvas.getBoundingClientRect();
         const x = e.touches[0].clientX - rect.left;
-        // Определяем колонку
-        const col = Math.floor(x / (canvas.width / answerCells));
+        // Исправлено: всегда корректно выбирает самую правую колонку
+        let col = Math.floor(x / (canvas.width / answerCells));
+        if (col >= answerCells) col = answerCells - 1;
         falling.x = Math.max(0, Math.min(answerCells - 1, col));
         // Double tap detection
         const now = Date.now();
@@ -123,6 +124,13 @@ canvas.addEventListener('touchstart', function (e) {
         lastTap = now;
     }
 });
+
+// --- Автофокус на canvas для работы стрелок в Telegram Mini Apps ---
+function setCanvasFocus() {
+    if (canvas.tabIndex === undefined || canvas.tabIndex < 0) canvas.tabIndex = 0;
+    canvas.focus();
+}
+setCanvasFocus();
 
 function getNormalSpeed() {
     return (2 + (level - 1) * 1.2) / 2;
@@ -145,6 +153,7 @@ function resetGame() {
         speed: getNormalSpeed(),
     };
     answers = generateAnswers(falling.answer);
+    setTimeout(setCanvasFocus, 100); // автофокус после сброса
 }
 
 function drawHeader() {
@@ -320,7 +329,7 @@ function drawAnswerCells() {
     }
 }
 
-const GAME_VERSION = '1';
+const GAME_VERSION = '2';
 
 function drawVersion() {
     ctx.save();
@@ -380,6 +389,7 @@ function update() {
             speed: getNormalSpeed(),
         };
         answers = generateAnswers(falling.answer);
+        setTimeout(setCanvasFocus, 100); // автофокус после нового уравнения
     }
     if (feedback) {
         feedback.timer--;
