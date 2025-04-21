@@ -206,27 +206,9 @@ function drawGameOver() {
     ctx.fillText('Нажмите любую клавишу для новой игры', canvas.width / 2, canvas.height / 2 + 70);
 }
 
-function drawFalling() {
-    ctx.fillStyle = '#1976d2';
-    ctx.font = '36px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    const fx = falling.x * cellWidth + cellWidth / 2;
-    const fy = falling.y + 40;
-    // Проверяем ширину текста
-    const text = falling.question;
-    const textWidth = ctx.measureText(text).width;
-    let drawX = fx;
-    // Если текст выходит за левую границу
-    if (drawX - textWidth / 2 < 0) {
-        drawX = textWidth / 2 + 5;
-    }
-    // Если текст выходит за правую границу
-    if (drawX + textWidth / 2 > canvas.width) {
-        drawX = canvas.width - textWidth / 2 - 5;
-    }
-    ctx.fillText(text, drawX, fy);
-}
+// Загрузка изображения динозавра
+const dinoImg = new Image();
+dinoImg.src = 'green_cartoon_dino.png';
 
 function drawDino() {
     // Динозавр занимает всё пространство между низом и плашкой
@@ -236,93 +218,13 @@ function drawDino() {
     const dinoWidth = canvas.width * 0.5;
     const dinoX = canvas.width / 2 - dinoWidth / 2;
     const dinoY = dinoTop;
-
-    // Тело (овал)
-    ctx.save();
-    ctx.beginPath();
-    ctx.ellipse(dinoX + dinoWidth / 2, dinoY + dinoHeight * 0.7, dinoWidth / 2, dinoHeight * 0.35, 0, 0, Math.PI * 2);
-    ctx.fillStyle = '#43d94a';
-    ctx.fill();
-    ctx.restore();
-
-    // Живот (светлый овал)
-    ctx.save();
-    ctx.beginPath();
-    ctx.ellipse(dinoX + dinoWidth / 2, dinoY + dinoHeight * 0.8, dinoWidth * 0.25, dinoHeight * 0.18, 0, 0, Math.PI * 2);
-    ctx.fillStyle = '#b6f7b9';
-    ctx.fill();
-    ctx.restore();
-
-    // Голова (круг)
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(dinoX + dinoWidth * 0.7, dinoY + dinoHeight * 0.25, dinoHeight * 0.22, 0, Math.PI * 2);
-    ctx.fillStyle = '#43d94a';
-    ctx.fill();
-    ctx.restore();
-
-    // Глаз
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(dinoX + dinoWidth * 0.8, dinoY + dinoHeight * 0.23, dinoHeight * 0.04, 0, Math.PI * 2);
-    ctx.fillStyle = '#222';
-    ctx.fill();
-    ctx.restore();
-
-    // Щёчка
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(dinoX + dinoWidth * 0.75, dinoY + dinoHeight * 0.3, dinoHeight * 0.03, 0, Math.PI * 2);
-    ctx.fillStyle = '#f7b6b6';
-    ctx.fill();
-    ctx.restore();
-
-    // Рот (дуга)
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(dinoX + dinoWidth * 0.8, dinoY + dinoHeight * 0.28, dinoHeight * 0.06, Math.PI * 0.15, Math.PI * 0.85);
-    ctx.strokeStyle = '#222';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.restore();
-
-    // Руки
-    ctx.save();
-    ctx.strokeStyle = '#43d94a';
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    ctx.moveTo(dinoX + dinoWidth * 0.35, dinoY + dinoHeight * 0.6);
-    ctx.lineTo(dinoX + dinoWidth * 0.18, dinoY + dinoHeight * 0.5);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(dinoX + dinoWidth * 0.65, dinoY + dinoHeight * 0.6);
-    ctx.lineTo(dinoX + dinoWidth * 0.82, dinoY + dinoHeight * 0.5);
-    ctx.stroke();
-    ctx.restore();
-
-    // Ноги
-    ctx.save();
-    ctx.strokeStyle = '#43d94a';
-    ctx.lineWidth = 10;
-    ctx.beginPath();
-    ctx.moveTo(dinoX + dinoWidth * 0.45, dinoY + dinoHeight * 0.95);
-    ctx.lineTo(dinoX + dinoWidth * 0.45, dinoY + dinoHeight * 1.08);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(dinoX + dinoWidth * 0.55, dinoY + dinoHeight * 0.95);
-    ctx.lineTo(dinoX + dinoWidth * 0.55, dinoY + dinoHeight * 1.08);
-    ctx.stroke();
-    ctx.restore();
-
-    // Хвост
-    ctx.save();
-    ctx.strokeStyle = '#43d94a';
-    ctx.lineWidth = 12;
-    ctx.beginPath();
-    ctx.moveTo(dinoX + dinoWidth * 0.1, dinoY + dinoHeight * 0.7);
-    ctx.lineTo(dinoX - dinoWidth * 0.18, dinoY + dinoHeight * 0.5);
-    ctx.stroke();
-    ctx.restore();
+    if (dinoImg.complete) {
+        ctx.drawImage(dinoImg, dinoX, dinoY, dinoWidth, dinoHeight);
+    } else {
+        dinoImg.onload = () => {
+            ctx.drawImage(dinoImg, dinoX, dinoY, dinoWidth, dinoHeight);
+        };
+    }
 }
 
 function drawAnswerCells() {
@@ -340,7 +242,7 @@ function drawAnswerCells() {
     }
 }
 
-const GAME_VERSION = '5';
+const GAME_VERSION = '6';
 
 function drawVersion() {
     ctx.save();
