@@ -28,42 +28,51 @@ function generateExample() {
         c = Math.floor(Math.random() * 11) - 5;
     }
     // Формируем левую и правую части
-    // ax + b = cx + d
-    // b*x + a = c*x + d
-    // Решаем: (b-c)x = d-a => x = (d-a)/(b-c)
-    // Но мы хотим, чтобы x был целым, поэтому d = (b-c)*x + a
     d = (b - c) * x + a;
-    // Формируем варианты записи
     let left, right;
     // Случайный порядок: x слева или справа
     if (Math.random() < 0.5) {
         // x слева
         if (Math.random() < 0.5) {
-            left = `${b === 1 ? '' : (b === -1 ? '-' : b)}x${a >= 0 ? ' + ' + a : ' - ' + Math.abs(a)}`;
+            left = `${b === 1 ? '' : (b === -1 ? '-' : b)}x${a >= 0 ? ' + ' + a : (a < 0 ? ' - ' + Math.abs(a) : '')}`;
         } else {
-            left = `${a}${b >= 0 ? ' + ' + (b === 1 ? '' : b) + 'x' : ' - ' + (Math.abs(b) === 1 ? '' : Math.abs(b)) + 'x'}`;
+            left = `${a}${b >= 0 ? ' + ' + (b === 1 ? '' : b) + 'x' : (b < 0 ? ' - ' + (Math.abs(b) === 1 ? '' : Math.abs(b)) + 'x' : '')}`;
         }
         if (Math.random() < 0.5) {
-            right = `${c === 0 ? d : (c === 1 ? '' : (c === -1 ? '-' : c)) + 'x' + (d >= 0 ? ' + ' + d : ' - ' + Math.abs(d))}`;
+            right = `${c === 0 ? '' : (c === 1 ? '' : (c === -1 ? '-' : c)) + 'x'}${d >= 0 ? (c !== 0 ? ' + ' + d : d) : (d < 0 ? ' - ' + Math.abs(d) : '')}`;
         } else {
-            right = `${d}${c >= 0 ? ' + ' + (c === 1 ? '' : c) + 'x' : ' - ' + (Math.abs(c) === 1 ? '' : Math.abs(c)) + 'x'}`;
+            right = `${d}${c >= 0 ? (c !== 0 ? ' + ' + (c === 1 ? '' : c) + 'x' : '') : (c < 0 ? ' - ' + (Math.abs(c) === 1 ? '' : Math.abs(c)) + 'x' : '')}`;
         }
     } else {
         // x справа
         if (Math.random() < 0.5) {
-            right = `${b === 1 ? '' : (b === -1 ? '-' : b)}x${a >= 0 ? ' + ' + a : ' - ' + Math.abs(a)}`;
+            right = `${b === 1 ? '' : (b === -1 ? '-' : b)}x${a >= 0 ? ' + ' + a : (a < 0 ? ' - ' + Math.abs(a) : '')}`;
         } else {
-            right = `${a}${b >= 0 ? ' + ' + (b === 1 ? '' : b) + 'x' : ' - ' + (Math.abs(b) === 1 ? '' : Math.abs(b)) + 'x'}`;
+            right = `${a}${b >= 0 ? ' + ' + (b === 1 ? '' : b) + 'x' : (b < 0 ? ' - ' + (Math.abs(b) === 1 ? '' : Math.abs(b)) + 'x' : '')}`;
         }
         if (Math.random() < 0.5) {
-            left = `${c === 0 ? d : (c === 1 ? '' : (c === -1 ? '-' : c)) + 'x' + (d >= 0 ? ' + ' + d : ' - ' + Math.abs(d))}`;
+            left = `${c === 0 ? '' : (c === 1 ? '' : (c === -1 ? '-' : c)) + 'x'}${d >= 0 ? (c !== 0 ? ' + ' + d : d) : (d < 0 ? ' - ' + Math.abs(d) : '')}`;
         } else {
-            left = `${d}${c >= 0 ? ' + ' + (c === 1 ? '' : c) + 'x' : ' - ' + (Math.abs(c) === 1 ? '' : Math.abs(c)) + 'x'}`;
+            left = `${d}${c >= 0 ? (c !== 0 ? ' + ' + (c === 1 ? '' : c) + 'x' : '') : (c < 0 ? ' - ' + (Math.abs(c) === 1 ? '' : Math.abs(c)) + 'x' : '')}`;
         }
     }
-    // Убираем лишние + -
-    left = left.replace(/\+ -/g, '- ').replace(/ 1x/g, ' x').replace(/ -1x/g, ' -x').replace(/\+ 0x/g, '').replace(/ 0x/g, '').replace(/\+ 0/g, '').replace(/- 0/g, '').replace(/^0 /, '').replace(/\s+/g, ' ').trim();
-    right = right.replace(/\+ -/g, '- ').replace(/ 1x/g, ' x').replace(/ -1x/g, ' -x').replace(/\+ 0x/g, '').replace(/ 0x/g, '').replace(/\+ 0/g, '').replace(/- 0/g, '').replace(/^0 /, '').replace(/\s+/g, ' ').trim();
+    // Убираем лишние + - и пробелы
+    function cleanPart(part) {
+        part = part.replace(/\+ -/g, '- ')
+                   .replace(/ 1x/g, ' x')
+                   .replace(/ -1x/g, ' -x')
+                   .replace(/\+ 0x/g, '')
+                   .replace(/ 0x/g, '')
+                   .replace(/\+ 0/g, '')
+                   .replace(/- 0/g, '')
+                   .replace(/^0 /, '')
+                   .replace(/\s+/g, ' ').trim();
+        // Если после чистки пусто — подставить 0
+        if (part === '' || part === '+' || part === '-') part = '0';
+        return part;
+    }
+    left = cleanPart(left);
+    right = cleanPart(right);
     let eq = `${left} = ${right}`;
     return { question: eq, answer: x };
 }
@@ -111,11 +120,13 @@ canvas.addEventListener('touchstart', function (e) {
     }
     if (e.touches.length === 1) {
         const rect = canvas.getBoundingClientRect();
-        const x = e.touches[0].clientX - rect.left;
-        // Исправлено: всегда корректно выбирает самую правую колонку
-        let col = Math.floor(x / (canvas.width / answerCells));
+        // Переводим координаты тапа в координаты canvas
+        const x = (e.touches[0].clientX - rect.left) * (canvas.width / rect.width);
+        // Корректно определяем колонку (включая самую правую)
+        let col = Math.floor(x / cellWidth);
+        if (col < 0) col = 0;
         if (col >= answerCells) col = answerCells - 1;
-        falling.x = Math.max(0, Math.min(answerCells - 1, col));
+        falling.x = col;
         // Double tap detection
         const now = Date.now();
         if (now - lastTap < 350) {
