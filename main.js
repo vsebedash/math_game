@@ -210,7 +210,7 @@ function drawGameOver() {
 const dinoImg = new Image();
 dinoImg.src = 'green_cartoon_dino.png';
 
-const GAME_VERSION = '8';
+const GAME_VERSION = '9';
 
 function drawVersion() {
     ctx.save();
